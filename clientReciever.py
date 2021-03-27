@@ -1,25 +1,27 @@
-# client.py
+from sys import argv
+import socket													# Import socket module
 
-import socket					# Import socket module
+if len(argv) == 4:												# > python clientReciever.py host port filename
+	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)		# Create a socket object
+	host = argv[1]												# Get server machine name
+	port = int(argv[2])											# Reserve a port for your service.
+	print('\nConnecting to Server ...')
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)				# Create a socket object
-host = '192.168.1.8'		# Get local machine name
-port = 9150					# Reserve a port for your service.
-print('Connecting to Server...')
+	s.connect((host, port))
+	print(f'Connected to [{host}] port [{port}] !')
 
-s.connect((host, port))
-print(f'Connected to [{host}] port [{port}]')
+	with open(argv[3], 'wb') as f:
+		print('\tFile opened.')
+		while True:
+			print('\tReceiving data ...')
+			data = s.recv(1024)
+			if not data:
+				break
+			f.write(data)
 
-with open('receivedFromServer.json', 'wb') as f:
-	print('file opened')
-	while True:
-		print('receiving data...')
-		data = s.recv(1024)
-		if not data:
-			break
-		f.write(data)
-
-f.close()
-print('Successfully get the file')
-s.close()
-print('connection closed')
+	f.close()
+	print('\tFile successfully recieved.')
+	s.close()
+	print('Connection closed.\n')
+else:
+	print('\nNot enough info!\nUse "> python clientReciever.py host port filename" format.\n')
